@@ -24,13 +24,39 @@ body{
 h1{
     text-align:center;
     color:#2e7d32;
-    margin-bottom:10px;
+    margin-bottom:20px;
+    font-size:42px;
+}
+
+.game-rule{
+    max-width:900px;
+    margin:0 auto 25px auto;
+
+    background:#fff8e1;
+    border-left:8px solid #f9a825;
+    border-radius:12px;
+
+    padding:18px 25px;
+
+    text-align:center;
+    line-height:1.8;
+    font-size:18px;
+
+    color:#5d4037;
+
+    box-shadow:0 3px 12px rgba(0,0,0,.08);
+}
+
+.game-rule strong{
+    color:#2e7d32;
+    font-size:20px;
 }
 
 .description{
     text-align:center;
-    color:#555;
     margin-bottom:40px;
+    color:#555;
+    font-size:17px;
 }
 
 .game-area{
@@ -38,14 +64,19 @@ h1{
     margin:auto;
 }
 
+.row-title{
+    text-align:center;
+    margin-bottom:15px;
+    color:#2e7d32;
+    font-size:24px;
+    font-weight:bold;
+}
+
 .row{
     display:grid;
     grid-template-columns:repeat(5,1fr);
     gap:16px;
-}
-
-.row:first-child{
-    margin-bottom:30px;
+    margin-bottom:40px;
 }
 
 .card{
@@ -72,19 +103,22 @@ h1{
     width:100%;
     height:100%;
     border-radius:18px;
-    backface-visibility:hidden;
+
     display:flex;
-    justify-content:center;
     align-items:center;
+    justify-content:center;
+
     text-align:center;
     padding:10px;
+
+    backface-visibility:hidden;
     font-weight:bold;
 }
 
 .front{
     background:#43a047;
     color:white;
-    font-size:26px;
+    font-size:30px;
 }
 
 .back{
@@ -98,47 +132,54 @@ h1{
 .matched{
     opacity:0;
     pointer-events:none;
-    transition:0.6s;
+    transition:.6s;
 }
 
 .modal{
     display:none;
     justify-content:center;
     align-items:center;
+
     position:fixed;
     inset:0;
-    background:rgba(0,0,0,.6);
+
+    background:rgba(0,0,0,.65);
+
     z-index:999;
 }
 
 .modal-content{
     width:90%;
-    max-width:650px;
+    max-width:700px;
+
     background:white;
     border-radius:20px;
+
     padding:35px;
     position:relative;
+
     animation:popup .3s ease;
 }
 
 @keyframes popup{
     from{
-        transform:scale(.8);
         opacity:0;
+        transform:scale(.8);
     }
     to{
-        transform:scale(1);
         opacity:1;
+        transform:scale(1);
     }
 }
 
 .close-icon{
-    position:absolute;
-    right:15px;
-    top:15px;
 
-    width:55px;
-    height:55px;
+    position:absolute;
+    top:15px;
+    right:15px;
+
+    width:60px;
+    height:60px;
 
     border:none;
     border-radius:50%;
@@ -146,39 +187,45 @@ h1{
     background:#e53935;
     color:white;
 
-    font-size:34px;
+    font-size:36px;
     font-weight:bold;
 
     cursor:pointer;
+
     box-shadow:0 4px 12px rgba(0,0,0,.3);
+
+    transition:.2s;
 }
 
 .close-icon:hover{
     background:#c62828;
-    transform:scale(1.08);
+    transform:scale(1.1);
 }
 
 .modal h2{
     color:#2e7d32;
-    margin-bottom:15px;
+    margin-bottom:20px;
     padding-right:70px;
 }
 
 .modal p{
-    line-height:1.9;
+    line-height:2;
     color:#444;
+    font-size:18px;
     margin-bottom:25px;
 }
 
 .next-btn{
+
     width:100%;
+
     border:none;
     border-radius:12px;
 
-    padding:16px;
-
     background:#43a047;
     color:white;
+
+    padding:16px;
 
     font-size:20px;
     font-weight:bold;
@@ -191,11 +238,16 @@ h1{
 }
 
 .win{
+
     display:none;
+
     text-align:center;
-    margin-top:40px;
-    font-size:32px;
+
+    margin-top:30px;
+
     color:#2e7d32;
+
+    font-size:36px;
     font-weight:bold;
 }
 
@@ -209,6 +261,9 @@ h1{
         height:100px;
     }
 
+    h1{
+        font-size:32px;
+    }
 }
 
 </style>
@@ -218,27 +273,39 @@ h1{
 
 <h1>🌸 植物花語翻翻樂 🌸</h1>
 
+<div class="game-rule">
+    🎮 <strong>遊戲方式</strong><br>
+    請從 <strong>上排植物卡</strong> 選擇一張，
+    再從 <strong>下排花語卡</strong> 選擇一張。<br>
+
+    若兩者配對正確，即可消除卡片並解鎖植物百科介紹！
+</div>
+
 <p class="description">
-找出正確的植物與花語配對，配對成功即可學習植物知識！
+找出所有正確的植物與花語配對，完成你的植物知識挑戰。
 </p>
 
 <div class="game-area">
 
+    <div class="row-title">
+        🌱 植物名稱
+    </div>
+
     <div id="plantRow" class="row"></div>
 
-    <br>
+    <div class="row-title">
+        💬 花語
+    </div>
 
     <div id="meaningRow" class="row"></div>
 
     <div id="winMessage" class="win">
-        🎉 恭喜完成全部植物配對！
+        🎉 恭喜完成全部配對！
     </div>
 
 </div>
 
-<!-- 彈出視窗 -->
-
-<div class="modal" id="modal">
+<div id="modal" class="modal">
 
     <div class="modal-content">
 
@@ -266,35 +333,35 @@ const plants = [
 id:1,
 name:"向日葵",
 meaning:"勇敢追夢",
-intro:"向日葵會隨著太陽轉動，因此被視為充滿希望、勇氣與追逐夢想的象徵。"
+intro:"向日葵會跟隨太陽轉動，因此象徵光明、勇氣以及追逐理想的精神。"
 },
 
 {
 id:2,
 name:"玫瑰",
 meaning:"真摯愛情",
-intro:"玫瑰象徵愛與浪漫，是世界上最常見的情感表達花卉。"
+intro:"玫瑰象徵愛情與浪漫，是世界上最具代表性的情感花卉之一。"
 },
 
 {
 id:3,
 name:"百合",
 meaning:"純潔祝福",
-intro:"百合代表純潔、高雅與幸福，常出現在祝福場合中。"
+intro:"百合花象徵純潔、高雅與幸福，經常出現在婚禮與祝福場合。"
 },
 
 {
 id:4,
 name:"薰衣草",
 meaning:"等待愛情",
-intro:"薰衣草充滿香氣，象徵守候與對愛情的期待。"
+intro:"薰衣草散發迷人香氣，象徵守候、等待以及對愛情的期待。"
 },
 
 {
 id:5,
 name:"櫻花",
 meaning:"珍惜當下",
-intro:"櫻花花期短暫，因此提醒人們珍惜生命中的每一刻。"
+intro:"櫻花花期短暫，因此常被視為珍惜生命與當下美好時光的象徵。"
 }
 
 ];
@@ -321,16 +388,15 @@ function createCard(text,id,type){
     card.dataset.type=type;
 
     card.innerHTML=`
+        <div class="card-inner">
 
-    <div class="card-inner">
+            <div class="front">?</div>
 
-        <div class="front">?</div>
+            <div class="back">
+                ${text}
+            </div>
 
-        <div class="back">
-            ${text}
         </div>
-
-    </div>
     `;
 
     card.addEventListener("click",flipCard);
@@ -394,18 +460,13 @@ function checkMatch(){
             if(matched===plants.length){
 
                 setTimeout(()=>{
-
-                    document.getElementById(
-                        "winMessage"
-                    ).style.display="block";
-
+                    document.getElementById("winMessage").style.display="block";
                 },500);
             }
 
         },500);
 
-    }
-    else{
+    }else{
 
         lock=true;
 
@@ -429,24 +490,21 @@ function resetCards(){
 
 function showPlantInfo(id){
 
-    const plant=
-    plants.find(p=>p.id==id);
+    const plant=plants.find(
+        p=>p.id==id
+    );
 
-    document.getElementById("plantName")
-    .textContent=plant.name;
+    document.getElementById("plantName").textContent=
+    plant.name;
 
-    document.getElementById("plantInfo")
-    .innerHTML=
+    document.getElementById("plantInfo").innerHTML=
     `<strong>花語：</strong>${plant.meaning}<br><br>${plant.intro}`;
 
-    document.getElementById("modal")
-    .style.display="flex";
+    document.getElementById("modal").style.display="flex";
 }
 
 function closeModal(){
-
-    document.getElementById("modal")
-    .style.display="none";
+    document.getElementById("modal").style.display="none";
 }
 
 </script>
