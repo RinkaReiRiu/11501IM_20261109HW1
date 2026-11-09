@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>植物花語翻翻樂</title>
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:"Microsoft JhengHei",sans-serif;
+}
+
+body{
+    background:linear-gradient(135deg,#e8f5e9,#f1f8e9);
+    min-height:100vh;
+    padding:30px;
+}
+
+h1{
+    text-align:center;
+    color:#2e7d32;
+    margin-bottom:10px;
+}
+
+.description{
+    text-align:center;
+    color:#555;
+    margin-bottom:40px;
+}
+
+.game-area{
+    max-width:1200px;
+    margin:auto;
+}
+
+.row{
+    display:grid;
+    grid-template-columns:repeat(5,1fr);
+    gap:16px;
+}
+
+.row:first-child{
+    margin-bottom:30px;
+}
+
+.card{
+    height:120px;
+    cursor:pointer;
+    perspective:1000px;
+}
+
+.card-inner{
+    width:100%;
+    height:100%;
+    position:relative;
+    transform-style:preserve-3d;
+    transition:0.6s;
+}
+
+.card.flipped .card-inner{
+    transform:rotateY(180deg);
+}
+
+.front,
+.back{
+    position:absolute;
+    width:100%;
+    height:100%;
+    border-radius:18px;
+    backface-visibility:hidden;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    text-align:center;
+    padding:10px;
+    font-weight:bold;
+}
+
+.front{
+    background:#43a047;
+    color:white;
+    font-size:26px;
+}
+
+.back{
+    background:white;
+    border:3px solid #43a047;
+    transform:rotateY(180deg);
+    color:#333;
+    font-size:18px;
+}
+
+.matched{
+    opacity:0;
+    pointer-events:none;
+    transition:0.6s;
+}
+
+.modal{
+    display:none;
+    justify-content:center;
+    align-items:center;
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.6);
+    z-index:999;
+}
+
+.modal-content{
+    width:90%;
+    max-width:650px;
+    background:white;
+    border-radius:20px;
+    padding:35px;
+    position:relative;
+    animation:popup .3s ease;
+}
+
+@keyframes popup{
+    from{
+        transform:scale(.8);
+        opacity:0;
+    }
+    to{
+        transform:scale(1);
+        opacity:1;
+    }
+}
+
+.close-icon{
+    position:absolute;
+    right:15px;
+    top:15px;
+
+    width:55px;
+    height:55px;
+
+    border:none;
+    border-radius:50%;
+
+    background:#e53935;
+    color:white;
+
+    font-size:34px;
+    font-weight:bold;
+
+    cursor:pointer;
+    box-shadow:0 4px 12px rgba(0,0,0,.3);
+}
+
+.close-icon:hover{
+    background:#c62828;
+    transform:scale(1.08);
+}
+
+.modal h2{
+    color:#2e7d32;
+    margin-bottom:15px;
+    padding-right:70px;
+}
+
+.modal p{
+    line-height:1.9;
+    color:#444;
+    margin-bottom:25px;
+}
+
+.next-btn{
+    width:100%;
+    border:none;
+    border-radius:12px;
+
+    padding:16px;
+
+    background:#43a047;
+    color:white;
+
+    font-size:20px;
+    font-weight:bold;
+
+    cursor:pointer;
+}
+
+.next-btn:hover{
+    background:#2e7d32;
+}
+
+.win{
+    display:none;
+    text-align:center;
+    margin-top:40px;
+    font-size:32px;
+    color:#2e7d32;
+    font-weight:bold;
+}
+
+@media(max-width:768px){
+
+    .row{
+        grid-template-columns:repeat(2,1fr);
+    }
+
+    .card{
+        height:100px;
+    }
+
+}
+
+</style>
+</head>
+
+<body>
+
+<h1>🌸 植物花語翻翻樂 🌸</h1>
+
+<p class="description">
+找出正確的植物與花語配對，配對成功即可學習植物知識！
+</p>
+
+<div class="game-area">
+
+    <div id="plantRow" class="row"></div>
+
+    <br>
+
+    <div id="meaningRow" class="row"></div>
+
+    <div id="winMessage" class="win">
+        🎉 恭喜完成全部植物配對！
+    </div>
+
+</div>
+
+<!-- 彈出視窗 -->
+
+<div class="modal" id="modal">
+
+    <div class="modal-content">
+
+        <button class="close-icon" onclick="closeModal()">
+            ✕
+        </button>
+
+        <h2 id="plantName"></h2>
+
+        <p id="plantInfo"></p>
+
+        <button class="next-btn" onclick="closeModal()">
+            我知道了，繼續遊戲 →
+        </button>
+
+    </div>
+
+</div>
+
+<script>
+
+const plants = [
+
+{
+id:1,
+name:"向日葵",
+meaning:"勇敢追夢",
+intro:"向日葵會隨著太陽轉動，因此被視為充滿希望、勇氣與追逐夢想的象徵。"
+},
+
+{
+id:2,
+name:"玫瑰",
+meaning:"真摯愛情",
+intro:"玫瑰象徵愛與浪漫，是世界上最常見的情感表達花卉。"
+},
+
+{
+id:3,
+name:"百合",
+meaning:"純潔祝福",
+intro:"百合代表純潔、高雅與幸福，常出現在祝福場合中。"
+},
+
+{
+id:4,
+name:"薰衣草",
+meaning:"等待愛情",
+intro:"薰衣草充滿香氣，象徵守候與對愛情的期待。"
+},
+
+{
+id:5,
+name:"櫻花",
+meaning:"珍惜當下",
+intro:"櫻花花期短暫，因此提醒人們珍惜生命中的每一刻。"
+}
+
+];
+
+const plantRow=document.getElementById("plantRow");
+const meaningRow=document.getElementById("meaningRow");
+
+let firstCard=null;
+let secondCard=null;
+let lock=false;
+let matched=0;
+
+function shuffle(arr){
+    return [...arr].sort(()=>Math.random()-0.5);
+}
+
+function createCard(text,id,type){
+
+    const card=document.createElement("div");
+
+    card.className="card";
+
+    card.dataset.id=id;
+    card.dataset.type=type;
+
+    card.innerHTML=`
+
+    <div class="card-inner">
+
+        <div class="front">?</div>
+
+        <div class="back">
+            ${text}
+        </div>
+
+    </div>
+    `;
+
+    card.addEventListener("click",flipCard);
+
+    return card;
+}
+
+shuffle(plants).forEach(p=>{
+    plantRow.appendChild(
+        createCard(p.name,p.id,"plant")
+    );
+});
+
+shuffle(plants).forEach(p=>{
+    meaningRow.appendChild(
+        createCard(p.meaning,p.id,"meaning")
+    );
+});
+
+function flipCard(){
+
+    if(lock) return;
+
+    if(this===firstCard) return;
+
+    this.classList.add("flipped");
+
+    if(!firstCard){
+        firstCard=this;
+        return;
+    }
+
+    secondCard=this;
+
+    checkMatch();
+}
+
+function checkMatch(){
+
+    const sameID=
+    firstCard.dataset.id===secondCard.dataset.id;
+
+    const differentType=
+    firstCard.dataset.type!==secondCard.dataset.type;
+
+    if(sameID && differentType){
+
+        lock=true;
+
+        setTimeout(()=>{
+
+            firstCard.classList.add("matched");
+            secondCard.classList.add("matched");
+
+            matched++;
+
+            showPlantInfo(firstCard.dataset.id);
+
+            resetCards();
+
+            if(matched===plants.length){
+
+                setTimeout(()=>{
+
+                    document.getElementById(
+                        "winMessage"
+                    ).style.display="block";
+
+                },500);
+            }
+
+        },500);
+
+    }
+    else{
+
+        lock=true;
+
+        setTimeout(()=>{
+
+            firstCard.classList.remove("flipped");
+            secondCard.classList.remove("flipped");
+
+            resetCards();
+
+        },1000);
+    }
+}
+
+function resetCards(){
+
+    firstCard=null;
+    secondCard=null;
+    lock=false;
+}
+
+function showPlantInfo(id){
+
+    const plant=
+    plants.find(p=>p.id==id);
+
+    document.getElementById("plantName")
+    .textContent=plant.name;
+
+    document.getElementById("plantInfo")
+    .innerHTML=
+    `<strong>花語：</strong>${plant.meaning}<br><br>${plant.intro}`;
+
+    document.getElementById("modal")
+    .style.display="flex";
+}
+
+function closeModal(){
+
+    document.getElementById("modal")
+    .style.display="none";
+}
+
+</script>
+
+</body>
+</html>
